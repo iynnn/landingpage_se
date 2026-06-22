@@ -530,6 +530,51 @@
             user-select: none;
             text-shadow: 0 2px 10px rgba(255, 106, 0, 0.4); /* Glow tipis hangat */
         }
+
+        /* Mobile Responsive adjustment for Modal */
+        @media (max-width: 480px) {
+            .modal-content {
+                padding: 30px 20px;
+                width: 92%;
+                border-radius: 24px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            .modal-icon-container {
+                width: 80px;
+                height: 80px;
+                margin-bottom: 15px;
+            }
+            .modal-icon {
+                font-size: 40px;
+            }
+            .modal-title {
+                font-size: 1.35rem;
+                margin-bottom: 8px;
+            }
+            .modal-text {
+                font-size: 0.9rem;
+                line-height: 1.5;
+                margin-bottom: 20px;
+                padding: 0;
+            }
+            .modal-btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+                width: 100%;
+            }
+            .modal-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .modal-close {
+                top: 15px;
+                right: 15px;
+                width: 28px;
+                height: 28px;
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -796,45 +841,56 @@
                 }
             });
 
-            // --- Mouse Paw & Sparkle Trail ---
+            // --- Mouse & Touch Paw/Sparkle Trail ---
             let lastX = 0;
             let lastY = 0;
-            const minDistance = 25; // Lebih rapat agar lebih ramai/festive
+            const minDistance = 25; // Jarak minimal antar jejak
 
-            // Beraneka ragam item lucu
             const trailItems = ["🐾", "🐾", "✨", "❤️", "🫧", "🐱", "🐾", "✨", "🌟"];
 
-            document.addEventListener("mousemove", (e) => {
-                const dist = Math.hypot(e.pageX - lastX, e.pageY - lastY);
+            const spawnTrail = (x, y) => {
+                const dist = Math.hypot(x - lastX, y - lastY);
                 if (dist < minDistance) return;
 
-                lastX = e.pageX;
-                lastY = e.pageY;
+                lastX = x;
+                lastY = y;
 
                 const paw = document.createElement("div");
                 paw.className = "paw-trail";
                 paw.innerText = trailItems[Math.floor(Math.random() * trailItems.length)];
-                paw.style.left = `${e.pageX}px`;
-                paw.style.top = `${e.pageY}px`;
+                paw.style.left = `${x}px`;
+                paw.style.top = `${y}px`;
                 
-                const rotate = (Math.random() - 0.5) * 45; // Sedikit miring alami
+                const rotate = (Math.random() - 0.5) * 45;
                 const scale = 0.6 + Math.random() * 0.6;
                 paw.style.transform = `translate(-50%, -50%) rotate(${rotate}deg) scale(${scale})`;
                 
                 document.body.appendChild(paw);
 
-                // Buat jejak melayang naik dan memudar
+                // Efek melayang naik dan memudar
                 setTimeout(() => {
-                    const driftY = -15 - Math.random() * 25; // Melayang ke atas
-                    const driftX = (Math.random() - 0.5) * 20; // Melayang sedikit ke kiri/kanan
+                    const driftY = -15 - Math.random() * 25;
+                    const driftX = (Math.random() - 0.5) * 20;
                     paw.style.opacity = "0";
                     paw.style.transform = `translate(calc(-50% + ${driftX}px), calc(-50% + ${driftY}px)) rotate(${rotate + (Math.random() - 0.5) * 60}deg) scale(0.2)`;
                 }, 50);
 
                 setTimeout(() => {
                     paw.remove();
-                }, 650); // Cepat hilang agar layar tetap rapi & performa terjaga
+                }, 650);
+            };
+
+            // Mouse moves on PC
+            document.addEventListener("mousemove", (e) => {
+                spawnTrail(e.pageX, e.pageY);
             });
+
+            // Touch dragging on mobile
+            document.addEventListener("touchmove", (e) => {
+                if (e.touches && e.touches[0]) {
+                    spawnTrail(e.touches[0].pageX, e.touches[0].pageY);
+                }
+            }, { passive: true });
         });
     </script>
 </body>
